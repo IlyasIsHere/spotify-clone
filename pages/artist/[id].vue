@@ -16,7 +16,6 @@
               v-for="track in topTracks"
               :key="track.id"
               :track="track"
-              @select="playTrack"
             />
           </div>
         </section>

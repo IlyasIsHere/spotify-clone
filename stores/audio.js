@@ -9,6 +9,8 @@ export const useAudioStore = defineStore('audio', {
     progress: 0
   }),
 
+  persist: true,
+
   actions: {
     initAudio() {
       if (!this.audio) {

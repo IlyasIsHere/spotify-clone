@@ -16,7 +16,6 @@
             v-for="track in playlist?.tracks?.items"
             :key="track.track.id"
             :track="track.track"
-            @select="playTrack"
           />
         </div>
       </section>
@@ -32,7 +31,6 @@ const audioStore = useAudioStore()
 
 // State
 const playlist = ref(null)
-const playerStore = usePlayerStore()
 
 // Fetch playlist data
 const fetchPlaylist = async () => {

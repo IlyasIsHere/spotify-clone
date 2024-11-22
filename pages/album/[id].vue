@@ -17,7 +17,6 @@
               v-for="track in album.tracks.items"
               :key="track.id"
               :track="track"
-              @select="playTrack"
             />
           </div>
         </section>

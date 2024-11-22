@@ -19,7 +19,6 @@
               v-for="track in recommendedTracks"
               :key="track.id"
               :track="track"
-              @select="playTrack"
             />
           </div>
         </section>
@@ -58,11 +57,6 @@
   
   const goToPlaylist = (playlist) => {
     router.push(`/playlist/${playlist.id}`);
-  };
-  
-  const playTrack = (track) => {
-    store.commit('setCurrentTrack', track);
-    store.commit('setIsPlaying', true);
   };
   
   onMounted(() => {
