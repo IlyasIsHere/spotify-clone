@@ -52,6 +52,7 @@ export const useAudioStore = defineStore('audio', {
       if (!this.currentTrack || this.currentTrack.id !== track.id) {
         this.currentTrack = track
         this.audio.src = track.preview_url
+        this.progress = 0
       }
 
       try {

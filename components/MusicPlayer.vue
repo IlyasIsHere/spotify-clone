@@ -14,7 +14,11 @@
       </div>
       
       <div class="mb-4">
-        <div class="relative h-1 bg-gray-700 rounded-full overflow-hidden">
+        <div 
+          class="relative h-1 bg-gray-700 rounded-full overflow-hidden cursor-pointer" 
+          @click="handleProgressClick"
+          ref="progressBar"
+        >
           <div 
             class="absolute top-0 left-0 h-full bg-green-500 transition-all duration-300 ease-in-out"
             :style="{ width: `${audioStore.progress}%` }"
@@ -52,6 +56,7 @@
 import { PlayIcon, PauseIcon, VolumeIcon } from 'lucide-vue-next'
 
 const audioStore = useAudioStore()
+const progressBar = ref(null)
 
 const volume = ref(audioStore.volume)
 
@@ -59,6 +64,21 @@ const artistNames = computed(() => {
   if (!audioStore.currentTrack) return ''
   return audioStore.currentTrack.artists.map(artist => artist.name).join(', ')
 })
+
+const handleProgressClick = (event) => {
+  if (!progressBar.value) return
+  
+  const rect = progressBar.value.getBoundingClientRect()
+  const clickPosition = event.clientX - rect.left
+  const progressBarWidth = rect.width
+  const percentage = (clickPosition / progressBarWidth) * 100
+  
+  // Set the current time of the audio based on the percentage
+  if (audioStore.audio) {
+    const newTime = (percentage / 100) * audioStore.audio.duration
+    audioStore.audio.currentTime = newTime
+  }
+}
 </script>
 
 <style scoped>
