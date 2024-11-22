@@ -35,13 +35,13 @@
   
   const recommendedPlaylists = ref([]);
   const recommendedTracks = ref([]);
-  const store = useStore();
+  const auth = useAuth()
   const router = useRouter();
   
   const fetchRecommendedPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${auth.token.value}`
       }
     });
     const data = await response.json();
@@ -51,7 +51,7 @@
   const fetchRecommendedTracks = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${auth.token.value}`
       }
     });
     const data = await response.json();
