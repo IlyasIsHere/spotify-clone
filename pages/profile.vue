@@ -2,10 +2,10 @@
     <div>
       <div class="content">
         <div class="profile-header">
-          <img :src="user.value.images[0]?.url" alt="user.value.display_name" class="profile-image" />
+          <img :src="user?.images[0]?.url" :alt="user?.display_name" class="profile-image" />
           <div class="profile-info">
-            <h2>{{ user.value.display_name }}</h2>
-            <p>{{ user.value.email }}</p>
+            <h2>{{ user?.display_name }}</h2>
+            <p>{{ user?.email }}</p>
             <button @click="logout">Logout</button>
           </div>
         </div>
@@ -13,11 +13,11 @@
           <h2>Your Top Artists</h2>
           <div class="artists">
             <div
-              v-for="artist in topArtists.value"
+              v-for="artist in topArtists"
               :key="artist.id"
               class="artist-card"
             >
-              <img :src="artist.images[0]?.url" alt="artist.name" class="artist-image" />
+              <img :src="artist.images[0]?.url" :alt="artist.name" class="artist-image" />
               <div class="artist-info">
                 <h3>{{ artist.name }}</h3>
               </div>
@@ -28,10 +28,9 @@
           <h2>Your Top Tracks</h2>
           <div class="tracks">
             <TrackCard
-              v-for="track in topTracks.value"
+              v-for="track in topTracks"
               :key="track.id"
               :track="track"
-              @select="playTrack"
             />
           </div>
         </section>
@@ -40,20 +39,18 @@
   </template>
   
   <script setup>
-//   import { ref, onMounted } from 'vue';
-//   import { useRouter, useStore } from 'vuex';
-//   import TrackCard from '~/components/TrackCard.vue';
   
   const user = ref(null);
   const topArtists = ref([]);
   const topTracks = ref([]);
-  const store = useStore();
+  const authStore = useAuthStore();
+  const audioStore = useAudioStore();
   const router = useRouter();
   
   const fetchUserProfile = async () => {
     const response = await fetch('https://api.spotify.com/v1/me', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     user.value = await response.json();
@@ -62,7 +59,7 @@
   const fetchTopArtists = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/top/artists', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     const data = await response.json();
@@ -72,7 +69,7 @@
   const fetchTopTracks = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     const data = await response.json();
@@ -80,13 +77,8 @@
   };
   
   const logout = () => {
-    store.commit('logout');
+    authStore.clearAuth();
     router.push('/');
-  };
-  
-  const playTrack = (track) => {
-    store.commit('setCurrentTrack', track);
-    store.commit('setIsPlaying', true);
   };
   
   onMounted(() => {
