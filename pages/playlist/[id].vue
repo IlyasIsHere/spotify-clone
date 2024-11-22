@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavigationBar />
     <div class="content">
       <div class="playlist-header">
         <img :src="playlist?.images[0]?.url" :alt="playlist?.name" class="playlist-image" />
@@ -26,13 +25,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRoute } from 'vue-router'
-import { useAuth } from '~/composables/useAuth'
-
+// Nuxt-specific imports
 const route = useRoute()
 const auth = useAuth()
+
+// State
 const playlist = ref(null)
+const playerStore = usePlayerStore()
 
 // Fetch playlist data
 const fetchPlaylist = async () => {
@@ -42,7 +41,6 @@ const fetchPlaylist = async () => {
         Authorization: `Bearer ${auth.token.value}`
       }
     })
-    console.log(auth.token.value)
     playlist.value = await response.json()
   } catch (error) {
     console.error('Error fetching playlist:', error)
@@ -51,14 +49,18 @@ const fetchPlaylist = async () => {
 
 // Play track handler
 const playTrack = (track) => {
-  const store = useStore()
-  store.commit('setCurrentTrack', track)
-  store.commit('setIsPlaying', true)
+  playerStore.setCurrentTrack(track)
+  playerStore.setIsPlaying(true)
 }
 
-// Fetch playlist data on component mount
+// Fetch data on mount
 onMounted(() => {
   fetchPlaylist()
+})
+
+// Define page meta
+definePageMeta({
+  middleware: 'auth'
 })
 </script>
 
