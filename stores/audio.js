@@ -9,7 +9,10 @@ export const useAudioStore = defineStore('audio', {
     progress: 0
   }),
 
-  persist: true,
+  persist: {
+    storage: piniaPluginPersistedstate.localStorage(),
+    pick: ['currentTrack', 'volume', 'progress']
+  },
 
   actions: {
     initAudio() {
@@ -20,6 +23,11 @@ export const useAudioStore = defineStore('audio', {
         // Add event listeners
         this.audio.addEventListener('timeupdate', this.updateProgress)
         this.audio.addEventListener('ended', this.handleTrackEnd)
+
+        // If there was a track playing before refresh, reload it
+        if (this.currentTrack?.preview_url) {
+          this.audio.src = this.currentTrack.preview_url
+        }
       }
     },
 
