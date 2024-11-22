@@ -15,18 +15,15 @@
   </template>
   
   <script setup>
-//   import { ref, onMounted } from 'vue';
-//   import { useRouter, useStore } from 'vuex';
-//   import PlaylistCard from '~/components/PlaylistCard.vue';
   
   const userPlaylists = ref([]);
-  const auth = useAuth();
+  const authStore = useAuthStore();
   const router = useRouter();
   
   const fetchUserPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {
-        Authorization: `Bearer ${auth.token.value}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     const data = await response.json();

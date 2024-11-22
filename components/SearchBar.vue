@@ -34,7 +34,7 @@ const results = ref([]);
  * Adjust this according to how you manage your authentication.
  * For example, you might use useState or useAuth composables.
  */
-const auth = useAuth();
+const authStore = useAuthStore();
 
 /**
  * Debounce the search input to prevent excessive API calls.
@@ -65,7 +65,7 @@ const fetchResults = async () => {
       )}&type=artist,album,playlist,track`,
       {
         headers: {
-          Authorization: `Bearer ${auth.token.value}`,
+          Authorization: `Bearer ${authStore.token}`,
         },
       }
     );

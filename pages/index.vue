@@ -28,30 +28,28 @@
   </template>
   
   <script setup>
-//   import { ref, onMounted } from 'vue';
-//   import { useRouter, useStore } from 'vuex';
-//   import PlaylistCard from '~/components/PlaylistCard.vue';
-//   import TrackCard from '~/components/TrackCard.vue';
   
   const recommendedPlaylists = ref([]);
   const recommendedTracks = ref([]);
-  const auth = useAuth()
+  const authStore = useAuthStore()
   const router = useRouter();
   
   const fetchRecommendedPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
       headers: {
-        Authorization: `Bearer ${auth.token.value}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     const data = await response.json();
+    console.log(authStore);
+    
     recommendedPlaylists.value = data.playlists.items;
   };
   
   const fetchRecommendedTracks = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
       headers: {
-        Authorization: `Bearer ${auth.token.value}`
+        Authorization: `Bearer ${authStore.token}`
       }
     });
     const data = await response.json();

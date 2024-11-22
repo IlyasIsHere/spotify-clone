@@ -1,8 +1,7 @@
 export const useAuth = () => {
   const config = useRuntimeConfig()
-  const token = useState('spotify_token', () => null)
-  const user = useState('spotify_user', () => null)
-
+  const authStore = useAuthStore()
+  
   const login = () => {
     const scope = 'user-read-private user-read-email playlist-read-private playlist-modify-public playlist-modify-private user-top-read'
     const params = new URLSearchParams({
@@ -35,16 +34,17 @@ export const useAuth = () => {
       })
 
       const data = await response.json()
-      token.value = data.access_token
+      authStore.setToken(data.access_token)
 
       // Fetch user profile
       const userResponse = await fetch('https://api.spotify.com/v1/me', {
         headers: {
-          Authorization: `Bearer ${token.value}`,
+          Authorization: `Bearer ${authStore.token}`,
         },
       })
       
-      user.value = await userResponse.json()
+      const userData = await userResponse.json()
+      authStore.setUser(userData)
     } catch (error) {
       console.error('Authentication error:', error)
       throw error
@@ -52,17 +52,16 @@ export const useAuth = () => {
   }
 
   const logout = () => {
-    token.value = null
-    user.value = null
+    authStore.clearAuth()
     navigateTo('/login')
   }
 
   return {
-    token,
-    user,
+    token: computed(() => authStore.token),
+    user: computed(() => authStore.user),
     login,
     handleCallback,
     logout,
-    isAuthenticated: computed(() => !!token.value)
+    isAuthenticated: computed(() => authStore.isAuthenticated)
   }
 }

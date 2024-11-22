@@ -27,7 +27,7 @@
 <script setup>
 // Nuxt-specific imports
 const route = useRoute()
-const auth = useAuth()
+const authStore = useAuthStore()
 const audioStore = useAudioStore()
 
 // State
@@ -39,7 +39,7 @@ const fetchPlaylist = async () => {
   try {
     const response = await fetch(`https://api.spotify.com/v1/playlists/${route.params.id}`, {
       headers: {
-        Authorization: `Bearer ${auth.token.value}`
+        Authorization: `Bearer ${authStore.token}`
       }
     })
     playlist.value = await response.json()

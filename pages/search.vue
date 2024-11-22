@@ -64,11 +64,7 @@
   </template>
   
   <script setup>
-//   import { ref } from 'vue';
-//   import { useRouter, useStore } from 'vuex';
-//   import SearchBar from '~/components/SearchBar.vue';
-//   import PlaylistCard from '~/components/PlaylistCard.vue';
-//   import TrackCard from '~/components/TrackCard.vue';
+
   
   const searchResults = ref([]);
   const artists = ref([]);

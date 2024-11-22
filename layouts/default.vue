@@ -31,6 +31,8 @@
     <div class="container mx-auto p-4">
       <NuxtPage />
     </div>
+
+    <MusicPlayer />
   </div>
 </template>
 
