@@ -1,5 +1,5 @@
 <template>
-  <div class="track-card" @click="selectTrack">
+  <div class="track-card" @click="playTrack">
     <img
       :src="track.album.images[0]?.url"
       :alt="track.name"
@@ -21,11 +21,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['select']);
+const audioStore = useAudioStore()
 
-const selectTrack = () => {
-  emit('select', props.track);
-};
+const playTrack = () => {
+  audioStore.playTrack(props.track)
+}
 
 const artistNames = computed(() =>
   props.track.artists.map((artist) => artist.name).join(', ')

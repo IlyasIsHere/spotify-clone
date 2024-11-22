@@ -1,54 +1,48 @@
 <template>
   <div class="music-player">
-    <div class="track-info" v-if="currentTrack">
+    <div class="track-info" v-if="audioStore.currentTrack">
       <img
-        :src="currentTrack.album.images[0]?.url"
-        :alt="currentTrack.name"
+        :src="audioStore.currentTrack.album.images[0]?.url"
+        :alt="audioStore.currentTrack.name"
         class="track-image"
       />
       <div class="track-details">
-        <h3>{{ currentTrack.name }}</h3>
+        <h3>{{ audioStore.currentTrack.name }}</h3>
         <p>{{ artistNames }}</p>
-        <p>{{ currentTrack.album.name }}</p>
+        <p>{{ audioStore.currentTrack.album.name }}</p>
       </div>
     </div>
     <div class="controls">
-      <button @click="prevTrack">Prev</button>
-      <button @click="togglePlay">{{ isPlaying ? 'Pause' : 'Play' }}</button>
-      <button @click="nextTrack">Next</button>
+      <div class="progress-bar">
+        <div 
+          class="progress" 
+          :style="{ width: `${audioStore.progress}%` }"
+        ></div>
+      </div>
+      <button @click="audioStore.togglePlay">
+        {{ audioStore.isPlaying ? 'Pause' : 'Play' }}
+      </button>
+      <input 
+        type="range" 
+        min="0" 
+        max="1" 
+        step="0.1" 
+        v-model="volume"
+        @input="audioStore.setVolume(parseFloat($event.target.value))"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-const props = defineProps({
-  currentTrack: {
-    type: Object,
-    required: true,
-  },
-  isPlaying: {
-    type: Boolean,
-    required: true,
-  },
-});
+const audioStore = useAudioStore()
 
-const emit = defineEmits(['toggle-play', 'prev-track', 'next-track']);
+const volume = ref(audioStore.volume)
 
-const togglePlay = () => {
-  emit('toggle-play');
-};
-
-const prevTrack = () => {
-  emit('prev-track');
-};
-
-const nextTrack = () => {
-  emit('next-track');
-};
-
-const artistNames = computed(() =>
-  props.currentTrack.artists.map((artist) => artist.name).join(', ')
-);
+const artistNames = computed(() => {
+  if (!audioStore.currentTrack) return ''
+  return audioStore.currentTrack.artists.map(artist => artist.name).join(', ')
+})
 </script>
 
 <style scoped>
@@ -107,5 +101,20 @@ button {
 
 button:hover {
   background-color: #ddd;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #ddd;
+  border-radius: 2px;
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background-color: #1DB954;
+  transition: width 0.1s linear;
 }
 </style>

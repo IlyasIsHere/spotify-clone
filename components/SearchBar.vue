@@ -34,7 +34,7 @@ const results = ref([]);
  * Adjust this according to how you manage your authentication.
  * For example, you might use useState or useAuth composables.
  */
-const accessToken = useState('accessToken');
+const auth = useAuth();
 
 /**
  * Debounce the search input to prevent excessive API calls.
@@ -59,13 +59,13 @@ const onSearch = () => {
 
 const fetchResults = async () => {
   try {
-    const response = await fetch(
+    const response = await useFetch(
       `https://api.spotify.com/v1/search?q=${encodeURIComponent(
         query.value
       )}&type=artist,album,playlist,track`,
       {
         headers: {
-          Authorization: `Bearer ${accessToken.value}`,
+          Authorization: `Bearer ${auth.token.value}`,
         },
       }
     );

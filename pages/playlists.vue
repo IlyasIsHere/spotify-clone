@@ -20,13 +20,13 @@
 //   import PlaylistCard from '~/components/PlaylistCard.vue';
   
   const userPlaylists = ref([]);
-  const store = useStore();
+  const auth = useAuth();
   const router = useRouter();
   
   const fetchUserPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/playlists', {
       headers: {
-        Authorization: `Bearer ${store.state.accessToken}`
+        Authorization: `Bearer ${auth.token.value}`
       }
     });
     const data = await response.json();

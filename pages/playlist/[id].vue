@@ -28,6 +28,7 @@
 // Nuxt-specific imports
 const route = useRoute()
 const auth = useAuth()
+const audioStore = useAudioStore()
 
 // State
 const playlist = ref(null)
@@ -49,8 +50,7 @@ const fetchPlaylist = async () => {
 
 // Play track handler
 const playTrack = (track) => {
-  playerStore.setCurrentTrack(track)
-  playerStore.setIsPlaying(true)
+  audioStore.playTrack(track)
 }
 
 // Fetch data on mount

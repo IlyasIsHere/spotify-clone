@@ -75,7 +75,7 @@
   const albums = ref([]);
   const playlists = ref([]);
   const tracks = ref([]);
-  const store = useStore();
+  const auth = useAuth();
   const router = useRouter();
   
   const handleSelect = (result) => {
