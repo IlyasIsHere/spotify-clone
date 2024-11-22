@@ -1,5 +1,6 @@
 export default defineNuxtConfig({
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'pinia-plugin-persistedstate/nuxt'],
+  ssr: false,
 
   runtimeConfig: {
     public: {

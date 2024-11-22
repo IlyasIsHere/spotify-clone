@@ -27,6 +27,15 @@ export const useAudioStore = defineStore('audio', {
         // If there was a track playing before refresh, reload it
         if (this.currentTrack?.preview_url) {
           this.audio.src = this.currentTrack.preview_url
+          // Set the current time based on the stored progress percentage
+          if (this.progress > 0) {
+            // We need to wait for the metadata to load to get the duration
+            this.audio.addEventListener('loadedmetadata', () => {
+              if (!isNaN(this.audio.duration)) {
+                this.audio.currentTime = (this.progress / 100) * this.audio.duration
+              }
+            })
+          }
         }
       }
     },
@@ -69,7 +78,7 @@ export const useAudioStore = defineStore('audio', {
     },
 
     updateProgress() {
-      if (this.audio) {
+      if (this.audio && !isNaN(this.audio.duration)) {
         this.progress = (this.audio.currentTime / this.audio.duration) * 100
       }
     },
