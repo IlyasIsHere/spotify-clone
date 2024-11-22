@@ -18,10 +18,10 @@
           />
         </div>
 
-        <!-- Right: Account -->
+        <!-- Right: Profile -->
         <div>
-          <NuxtLink to="/account" class="text-gray-800 hover:text-green-500">
-            Account
+          <NuxtLink to="/profile" class="text-gray-800 hover:text-green-500">
+            Profile
           </NuxtLink>
         </div>
       </nav>
