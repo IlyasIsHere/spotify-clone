@@ -42,8 +42,8 @@
   </template>
   
   <script>
-  import NavigationBar from '~/components/NavigationBar.vue';
-  import TrackCard from '~/components/TrackCard.vue';
+//   import NavigationBar from '~/components/NavigationBar.vue';
+//   import TrackCard from '~/components/TrackCard.vue';
   
   export default {
     components: {

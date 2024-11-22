@@ -1,4 +1,5 @@
 export default defineNuxtConfig({
+  modules: ['@pinia/nuxt'],
   runtimeConfig: {
     public: {
       spotifyClientId: '85757fb36be04e9194cfcf2b0093edb8',
