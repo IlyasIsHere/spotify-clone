@@ -1,10 +1,14 @@
 <template>
   <div class="music-player">
     <div class="track-info" v-if="currentTrack">
-      <img :src="currentTrack.album.images[0]?.url" alt="currentTrack.name" class="track-image" />
+      <img
+        :src="currentTrack.album.images[0]?.url"
+        :alt="currentTrack.name"
+        class="track-image"
+      />
       <div class="track-details">
         <h3>{{ currentTrack.name }}</h3>
-        <p>{{ currentTrack.artists.map(artist => artist.name).join(', ') }}</p>
+        <p>{{ artistNames }}</p>
         <p>{{ currentTrack.album.name }}</p>
       </div>
     </div>
@@ -16,31 +20,35 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'MusicPlayer',
-  props: {
-    currentTrack: {
-      type: Object,
-      required: true
-    },
-    isPlaying: {
-      type: Boolean,
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  currentTrack: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    togglePlay() {
-      this.$emit('toggle-play');
-    },
-    prevTrack() {
-      this.$emit('prev-track');
-    },
-    nextTrack() {
-      this.$emit('next-track');
-    }
-  }
+  isPlaying: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+const emit = defineEmits(['toggle-play', 'prev-track', 'next-track']);
+
+const togglePlay = () => {
+  emit('toggle-play');
 };
+
+const prevTrack = () => {
+  emit('prev-track');
+};
+
+const nextTrack = () => {
+  emit('next-track');
+};
+
+const artistNames = computed(() =>
+  props.currentTrack.artists.map((artist) => artist.name).join(', ')
+);
 </script>
 
 <style scoped>

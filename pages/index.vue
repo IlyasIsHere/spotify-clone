@@ -1,6 +1,5 @@
 <template>
     <div>
-      <NavigationBar />
       <div class="content">
         <section class="recommended-playlists">
           <h2>Recommended Playlists</h2>
@@ -28,50 +27,50 @@
     </div>
   </template>
   
-  <script>
-//   import NavigationBar from '~/layout/default.vue';
+  <script setup>
+//   import { ref, onMounted } from 'vue';
+//   import { useRouter, useStore } from 'vuex';
 //   import PlaylistCard from '~/components/PlaylistCard.vue';
 //   import TrackCard from '~/components/TrackCard.vue';
   
-  export default {
-    data() {
-      return {
-        recommendedPlaylists: [],
-        recommendedTracks: []
-      };
-    },
-    async mounted() {
-      await this.fetchRecommendedPlaylists();
-      await this.fetchRecommendedTracks();
-    },
-    methods: {
-      async fetchRecommendedPlaylists() {
-        const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
-          headers: {
-            Authorization: `Bearer ${this.$store.state.accessToken}`
-          }
-        });
-        const data = await response.json();
-        this.recommendedPlaylists = data.playlists.items;
-      },
-      async fetchRecommendedTracks() {
-        const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
-          headers: {
-            Authorization: `Bearer ${this.$store.state.accessToken}`
-          }
-        });
-        const data = await response.json();
-        this.recommendedTracks = data.items;
-      },
-      goToPlaylist(playlist) {
-        this.$router.push(`/playlist/${playlist.id}`);
-      },
-      playTrack(track) {
-        this.$store.commit('setCurrentTrack', track);
-        this.$store.commit('setIsPlaying', true);
+  const recommendedPlaylists = ref([]);
+  const recommendedTracks = ref([]);
+  const store = useStore();
+  const router = useRouter();
+  
+  const fetchRecommendedPlaylists = async () => {
+    const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
+      headers: {
+        Authorization: `Bearer ${store.state.accessToken}`
       }
-    }
+    });
+    const data = await response.json();
+    recommendedPlaylists.value = data.playlists.items;
   };
+  
+  const fetchRecommendedTracks = async () => {
+    const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
+      headers: {
+        Authorization: `Bearer ${store.state.accessToken}`
+      }
+    });
+    const data = await response.json();
+    recommendedTracks.value = data.items;
+  };
+  
+  const goToPlaylist = (playlist) => {
+    router.push(`/playlist/${playlist.id}`);
+  };
+  
+  const playTrack = (track) => {
+    store.commit('setCurrentTrack', track);
+    store.commit('setIsPlaying', true);
+  };
+  
+  onMounted(() => {
+    fetchRecommendedPlaylists();
+    fetchRecommendedTracks();
+  });
   </script>
   
   <style scoped>

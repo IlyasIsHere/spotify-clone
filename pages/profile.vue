@@ -1,12 +1,11 @@
 <template>
     <div>
-      <NavigationBar />
       <div class="content">
         <div class="profile-header">
-          <img :src="user.images[0]?.url" alt="user.display_name" class="profile-image" />
+          <img :src="user.value.images[0]?.url" alt="user.value.display_name" class="profile-image" />
           <div class="profile-info">
-            <h2>{{ user.display_name }}</h2>
-            <p>{{ user.email }}</p>
+            <h2>{{ user.value.display_name }}</h2>
+            <p>{{ user.value.email }}</p>
             <button @click="logout">Logout</button>
           </div>
         </div>
@@ -14,7 +13,7 @@
           <h2>Your Top Artists</h2>
           <div class="artists">
             <div
-              v-for="artist in topArtists"
+              v-for="artist in topArtists.value"
               :key="artist.id"
               class="artist-card"
             >
@@ -29,7 +28,7 @@
           <h2>Your Top Tracks</h2>
           <div class="tracks">
             <TrackCard
-              v-for="track in topTracks"
+              v-for="track in topTracks.value"
               :key="track.id"
               :track="track"
               @select="playTrack"
@@ -40,64 +39,61 @@
     </div>
   </template>
   
-  <script>
-  import NavigationBar from '~/components/NavigationBar.vue';
-  import TrackCard from '~/components/TrackCard.vue';
+  <script setup>
+//   import { ref, onMounted } from 'vue';
+//   import { useRouter, useStore } from 'vuex';
+//   import TrackCard from '~/components/TrackCard.vue';
   
-  export default {
-    components: {
-      NavigationBar,
-      TrackCard
-    },
-    data() {
-      return {
-        user: null,
-        topArtists: [],
-        topTracks: []
-      };
-    },
-    async mounted() {
-      await this.fetchUserProfile();
-      await this.fetchTopArtists();
-      await this.fetchTopTracks();
-    },
-    methods: {
-      async fetchUserProfile() {
-        const response = await fetch('https://api.spotify.com/v1/me', {
-          headers: {
-            Authorization: `Bearer ${this.$store.state.accessToken}`
-          }
-        });
-        this.user = await response.json();
-      },
-      async fetchTopArtists() {
-        const response = await fetch('https://api.spotify.com/v1/me/top/artists', {
-          headers: {
-            Authorization: `Bearer ${this.$store.state.accessToken}`
-          }
-        });
-        const data = await response.json();
-        this.topArtists = data.items;
-      },
-      async fetchTopTracks() {
-        const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
-          headers: {
-            Authorization: `Bearer ${this.$store.state.accessToken}`
-          }
-        });
-        const data = await response.json();
-        this.topTracks = data.items;
-      },
-      logout() {
-        this.$store.commit('logout');
-        this.$router.push('/');
-      },
-      playTrack(track) {
-        this.$store.commit('setCurrentTrack', track);
-        this.$store.commit('setIsPlaying', true);
+  const user = ref(null);
+  const topArtists = ref([]);
+  const topTracks = ref([]);
+  const store = useStore();
+  const router = useRouter();
+  
+  const fetchUserProfile = async () => {
+    const response = await fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: `Bearer ${store.state.accessToken}`
       }
-    }
+    });
+    user.value = await response.json();
   };
+  
+  const fetchTopArtists = async () => {
+    const response = await fetch('https://api.spotify.com/v1/me/top/artists', {
+      headers: {
+        Authorization: `Bearer ${store.state.accessToken}`
+      }
+    });
+    const data = await response.json();
+    topArtists.value = data.items;
+  };
+  
+  const fetchTopTracks = async () => {
+    const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
+      headers: {
+        Authorization: `Bearer ${store.state.accessToken}`
+      }
+    });
+    const data = await response.json();
+    topTracks.value = data.items;
+  };
+  
+  const logout = () => {
+    store.commit('logout');
+    router.push('/');
+  };
+  
+  const playTrack = (track) => {
+    store.commit('setCurrentTrack', track);
+    store.commit('setIsPlaying', true);
+  };
+  
+  onMounted(() => {
+    fetchUserProfile();
+    fetchTopArtists();
+    fetchTopTracks();
+  });
   </script>
   
   <style scoped>

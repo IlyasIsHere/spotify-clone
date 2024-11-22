@@ -1,6 +1,5 @@
 <template>
     <div>
-      <NavigationBar />
       <div class="content">
         <SearchBar @select="handleSelect" />
         <div v-if="searchResults.length" class="search-results">
@@ -64,43 +63,44 @@
     </div>
   </template>
   
-  <script>
+  <script setup>
+//   import { ref } from 'vue';
+//   import { useRouter, useStore } from 'vuex';
 //   import SearchBar from '~/components/SearchBar.vue';
 //   import PlaylistCard from '~/components/PlaylistCard.vue';
 //   import TrackCard from '~/components/TrackCard.vue';
   
-  export default {
-    data() {
-      return {
-        searchResults: [],
-        artists: [],
-        albums: [],
-        playlists: [],
-        tracks: []
-      };
-    },
-    methods: {
-      async handleSelect(result) {
-        this.searchResults = result;
-        this.artists = result.filter(item => item.type === 'Artist');
-        this.albums = result.filter(item => item.type === 'Album');
-        this.playlists = result.filter(item => item.type === 'Playlist');
-        this.tracks = result.filter(item => item.type === 'Track');
-      },
-      goToArtist(artist) {
-        this.$router.push(`/artist/${artist.id}`);
-      },
-      goToAlbum(album) {
-        this.$router.push(`/album/${album.id}`);
-      },
-      goToPlaylist(playlist) {
-        this.$router.push(`/playlist/${playlist.id}`);
-      },
-      playTrack(track) {
-        this.$store.commit('setCurrentTrack', track);
-        this.$store.commit('setIsPlaying', true);
-      }
-    }
+  const searchResults = ref([]);
+  const artists = ref([]);
+  const albums = ref([]);
+  const playlists = ref([]);
+  const tracks = ref([]);
+  const store = useStore();
+  const router = useRouter();
+  
+  const handleSelect = (result) => {
+    searchResults.value = result;
+    artists.value = result.filter(item => item.type === 'artist');
+    albums.value = result.filter(item => item.type === 'album');
+    playlists.value = result.filter(item => item.type === 'playlist');
+    tracks.value = result.filter(item => item.type === 'track');
+  };
+  
+  const goToArtist = (artist) => {
+    router.push(`/artist/${artist.id}`);
+  };
+  
+  const goToAlbum = (album) => {
+    router.push(`/album/${album.id}`);
+  };
+  
+  const goToPlaylist = (playlist) => {
+    router.push(`/playlist/${playlist.id}`);
+  };
+  
+  const playTrack = (track) => {
+    store.commit('setCurrentTrack', track);
+    store.commit('setIsPlaying', true);
   };
   </script>
   

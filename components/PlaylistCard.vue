@@ -1,6 +1,10 @@
 <template>
   <div class="playlist-card" @click="selectPlaylist">
-    <img :src="playlist.images[0]?.url" alt="playlist.name" class="playlist-image" />
+    <img
+      :src="playlist.images[0]?.url"
+      :alt="playlist.name"
+      class="playlist-image"
+    />
     <div class="playlist-info">
       <h3>{{ playlist.name }}</h3>
       <p>{{ playlist.description }}</p>
@@ -8,20 +12,18 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'PlaylistCard',
-  props: {
-    playlist: {
-      type: Object,
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  playlist: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    selectPlaylist() {
-      this.$emit('select', this.playlist);
-    }
-  }
+});
+
+const emit = defineEmits(['select']);
+
+const selectPlaylist = () => {
+  emit('select', props.playlist);
 };
 </script>
 

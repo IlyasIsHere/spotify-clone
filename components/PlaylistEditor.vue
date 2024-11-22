@@ -16,10 +16,14 @@
         :key="track.id"
         class="track-item"
       >
-        <img :src="track.album.images[0]?.url" alt="track.name" class="track-image" />
+        <img
+          :src="track.album.images[0]?.url"
+          :alt="track.name"
+          class="track-image"
+        />
         <div class="track-info">
           <h3>{{ track.name }}</h3>
-          <p>{{ track.artists.map(artist => artist.name).join(', ') }}</p>
+          <p>{{ getArtistNames(track) }}</p>
         </div>
         <button @click="removeTrack(track.id)">Remove</button>
       </div>
@@ -28,43 +32,43 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'PlaylistEditor',
-  props: {
-    playlist: {
-      type: Object,
-      default: () => ({
-        name: '',
-        description: '',
-        tracks: []
-      })
-    },
-    isEditing: {
-      type: Boolean,
-      default: false
-    }
+<script setup>
+const props = defineProps({
+  playlist: {
+    type: Object,
+    default: () => ({
+      name: '',
+      description: '',
+      tracks: [],
+    }),
   },
-  data() {
-    return {
-      playlistName: this.playlist.name,
-      playlistDescription: this.playlist.description,
-      tracks: this.playlist.tracks
-    };
+  isEditing: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    removeTrack(trackId) {
-      this.tracks = this.tracks.filter(track => track.id !== trackId);
-    },
-    savePlaylist() {
-      const updatedPlaylist = {
-        name: this.playlistName,
-        description: this.playlistDescription,
-        tracks: this.tracks
-      };
-      this.$emit('save', updatedPlaylist);
-    }
-  }
+});
+
+const emit = defineEmits(['save']);
+
+const playlistName = ref(props.playlist.name);
+const playlistDescription = ref(props.playlist.description);
+const tracks = ref([...props.playlist.tracks]);
+
+const removeTrack = (trackId) => {
+  tracks.value = tracks.value.filter((track) => track.id !== trackId);
+};
+
+const savePlaylist = () => {
+  const updatedPlaylist = {
+    name: playlistName.value,
+    description: playlistDescription.value,
+    tracks: tracks.value,
+  };
+  emit('save', updatedPlaylist);
+};
+
+const getArtistNames = (track) => {
+  return track.artists.map((artist) => artist.name).join(', ');
 };
 </script>
 
@@ -79,7 +83,8 @@ export default {
   border-radius: 4px;
 }
 
-input, textarea {
+input,
+textarea {
   width: 100%;
   max-width: 600px;
   padding: 10px;

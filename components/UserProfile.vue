@@ -1,6 +1,10 @@
 <template>
   <div class="user-profile">
-    <img :src="user.images[0]?.url" alt="user.display_name" class="profile-image" />
+    <img
+      :src="user.images[0]?.url"
+      :alt="user.display_name"
+      class="profile-image"
+    />
     <div class="profile-info">
       <h3>{{ user.display_name }}</h3>
       <p>{{ user.email }}</p>
@@ -9,20 +13,18 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'UserProfile',
-  props: {
-    user: {
-      type: Object,
-      required: true
-    }
+<script setup>
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true,
   },
-  methods: {
-    logout() {
-      this.$emit('logout');
-    }
-  }
+});
+
+const emit = defineEmits(['logout']);
+
+const logout = () => {
+  emit('logout');
 };
 </script>
 
