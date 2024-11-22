@@ -65,17 +65,11 @@
   </template>
   
   <script>
-  import SearchBar from '~/components/SearchBar.vue';
-  import PlaylistCard from '~/components/PlaylistCard.vue';
-  import TrackCard from '~/components/TrackCard.vue';
+//   import SearchBar from '~/components/SearchBar.vue';
+//   import PlaylistCard from '~/components/PlaylistCard.vue';
+//   import TrackCard from '~/components/TrackCard.vue';
   
   export default {
-    components: {
-      NavigationBar,
-      SearchBar,
-      PlaylistCard,
-      TrackCard
-    },
     data() {
       return {
         searchResults: [],

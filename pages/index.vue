@@ -29,16 +29,11 @@
   </template>
   
   <script>
-  import NavigationBar from '~/components/NavigationBar.vue';
-  import PlaylistCard from '~/components/PlaylistCard.vue';
-  import TrackCard from '~/components/TrackCard.vue';
+//   import NavigationBar from '~/layout/default.vue';
+//   import PlaylistCard from '~/components/PlaylistCard.vue';
+//   import TrackCard from '~/components/TrackCard.vue';
   
   export default {
-    components: {
-      NavigationBar,
-      PlaylistCard,
-      TrackCard
-    },
     data() {
       return {
         recommendedPlaylists: [],
