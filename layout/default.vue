@@ -4,11 +4,11 @@
       <nav class="container mx-auto p-4 flex justify-between items-center">
         <!-- Left: Home Link -->
         <div>
-          <router-link to="/" class="font-bold text-lg text-gray-800 hover:text-green-500">
+          <NuxtLink to="/" class="font-bold text-lg text-gray-800 hover:text-green-500">
             Home
-          </router-link>
+          </NuxtLink>
         </div>
-        
+
         <!-- Center: Search Bar -->
         <div class="flex-1 mx-4">
           <input
@@ -17,25 +17,25 @@
             class="w-full px-4 py-2 border rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
-        
+
         <!-- Right: Account -->
         <div>
-          <router-link to="/account" class="text-gray-800 hover:text-green-500">
+          <NuxtLink to="/account" class="text-gray-800 hover:text-green-500">
             Account
-          </router-link>
+          </NuxtLink>
         </div>
       </nav>
     </header>
 
     <!-- Page Content -->
     <div class="container mx-auto p-4">
-      <router-view />
+      <NuxtPage />
     </div>
   </div>
 </template>
 
 <style scoped>
-  .router-link-exact-active {
-    color: #12b488;
-  }
+.router-link-exact-active {
+  color: #12b488;
+}
 </style>
