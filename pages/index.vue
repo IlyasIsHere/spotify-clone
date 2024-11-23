@@ -82,20 +82,6 @@ const newPlaylist = ref({
 });
 const userPlaylists = ref([]);
 
-onBeforeMount(() => {
-  // Use authStore directly to check if the user is authenticated
-  if (!authStore.isAuthenticated) {
-    navigateTo('/login');  // Redirect to login if not authenticated
-  } else {
-    // Fetch data if authenticated
-    Promise.all([
-      fetchRecommendedPlaylists(),
-      fetchRecommendedTracks(),
-      fetchUserPlaylists()
-    ]);
-  }
-});
-
 const fetchRecommendedPlaylists = async () => {
   const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
     headers: {
