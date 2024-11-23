@@ -27,13 +27,31 @@
       </div>
       
       <div class="flex items-center justify-between">
-        <button 
-          @click="audioStore.togglePlay"
-          class="w-12 h-12 flex items-center justify-center bg-green-500 rounded-full hover:bg-green-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
-        >
-          <PlayIcon v-if="!audioStore.isPlaying" class="w-6 h-6" />
-          <PauseIcon v-else class="w-6 h-6" />
-        </button>
+        <div class="flex items-center gap-4">
+          <button 
+            @click="audioStore.playPreviousTrack"
+            class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+            :disabled="!audioStore.currentPlaylist"
+          >
+            <SkipBackIcon class="w-5 h-5" />
+          </button>
+
+          <button 
+            @click="audioStore.togglePlay"
+            class="w-12 h-12 flex items-center justify-center bg-green-500 rounded-full hover:bg-green-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+          >
+            <PlayIcon v-if="!audioStore.isPlaying" class="w-6 h-6" />
+            <PauseIcon v-else class="w-6 h-6" />
+          </button>
+
+          <button 
+            @click="audioStore.playNextTrack"
+            class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-white transition-colors"
+            :disabled="!audioStore.currentPlaylist"
+          >
+            <SkipForwardIcon class="w-5 h-5" />
+          </button>
+        </div>
         
         <div class="flex items-center flex-1 max-w-xs mx-4">
           <VolumeIcon class="w-4 h-4 text-gray-400 mr-2" />
@@ -53,7 +71,7 @@
 </template>
 
 <script setup>
-import { PlayIcon, PauseIcon, VolumeIcon } from 'lucide-vue-next'
+import { PlayIcon, PauseIcon, VolumeIcon, SkipBackIcon, SkipForwardIcon } from 'lucide-vue-next'
 
 const audioStore = useAudioStore()
 const progressBar = ref(null)
