@@ -8,12 +8,13 @@ export const useAudioStore = defineStore('audio', {
     volume: 1,
     progress: 0,
     currentPlaylist: null,
-    currentPlaylistIndex: 0
+    currentPlaylistIndex: 0,
+    image: null
   }),
 
   persist: {
     storage: piniaPluginPersistedstate.localStorage(),
-    pick: ['currentTrack', 'volume', 'progress', 'currentPlaylist', 'currentPlaylistIndex']
+    pick: ['currentTrack', 'volume', 'progress', 'currentPlaylist', 'currentPlaylistIndex', 'image']
   },
 
   actions: {
@@ -101,6 +102,10 @@ export const useAudioStore = defineStore('audio', {
       if (this.audio) {
         this.audio.volume = value
       }
+    },
+
+    setImage(url) {
+        this.image = url
     },
 
     async playPlaylist(playlist, startIndex = 0) {

@@ -1,29 +1,31 @@
 <template>
-  <div>
-    <div class="content">
-      <div class="playlist-header">
-        <img :src="playlist?.images[0]?.url" :alt="playlist?.name" class="playlist-image" />
-        <div class="playlist-info">
-          <h1>{{ playlist?.name }}</h1>
-          <p>{{ playlist?.description }}</p>
-          <p>By {{ playlist?.owner?.display_name }}</p>
-          <div class="playlist-controls">
-            <button @click="handlePlayPause" class="control-btn">
+  <div class="min-h-screen bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center mb-8">
+        <img :src="playlist?.images[0]?.url" :alt="playlist?.name" class="w-48 h-48 object-cover rounded-lg shadow-lg mb-4 md:mb-0 md:mr-8" />
+        <div class="flex-1">
+          <h1 class="text-4xl font-bold mb-2">{{ playlist?.name }}</h1>
+          <p class="text-gray-400 mb-2">{{ playlist?.description }}</p>
+          <p class="text-gray-400 mb-4">By {{ playlist?.owner?.display_name }}</p>
+          <div class="flex space-x-4">
+            <button @click="handlePlayPause" class="bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-6 rounded-full transition duration-300">
               {{ isPlaying ? 'Pause' : 'Play' }}
             </button>
-            <button @click="handleDelete" class="control-btn delete-btn">
+            <button @click="handleDelete" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full transition duration-300">
               Delete
             </button>
           </div>
         </div>
       </div>
-      <div class="add-tracks-section">
-        <h2>Add Tracks</h2>
+      
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Add Tracks</h2>
         <TrackSearch @add-track="addTrackToPlaylist" />
       </div>
-      <section class="tracks">
-        <h2>Tracks</h2>
-        <div class="track-list">
+      
+      <div>
+        <h2 class="text-2xl font-bold mb-4">Tracks</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           <TrackCard
             v-for="track in playlist?.tracks?.items"
             :key="track.track.id"
@@ -31,7 +33,7 @@
             @delete-track="deleteTrackFromPlaylist"
           />
         </div>
-      </section>
+      </div>
     </div>
   </div>
 </template>
@@ -41,13 +43,11 @@ const route = useRoute()
 const authStore = useAuthStore()
 const audioStore = useAudioStore()
 
-// State
 const playlist = ref(null)
 const isPlaying = computed(() => 
   audioStore.isPlaying && audioStore.currentPlaylist?.id === playlist.value?.id
 )
 
-// Fetch playlist data
 const fetchPlaylist = async () => {
   try {
     const response = await fetch(`https://api.spotify.com/v1/playlists/${route.params.id}`, {
@@ -61,7 +61,6 @@ const fetchPlaylist = async () => {
   }
 }
 
-// Handle play/pause
 const handlePlayPause = () => {
   if (isPlaying.value) {
     audioStore.pauseTrack()
@@ -80,29 +79,12 @@ const handleDelete = async () => {
         Authorization: `Bearer ${authStore.token}`
       }
     })
-    // Navigate back after successful deletion
     navigateTo('/playlists')
   } catch (error) {
     console.error('Error deleting playlist:', error)
   }
 }
 
-// Clean up when component unmounts
-onUnmounted(() => {
-  audioStore.$reset()
-})
-
-// Fetch data on mount
-onMounted(() => {
-  fetchPlaylist()
-})
-
-// Define page meta
-definePageMeta({
-  middleware: 'auth'
-})
-
-// Add track to playlist function
 const addTrackToPlaylist = async (track) => {
   try {
     const response = await fetch(
@@ -160,91 +142,16 @@ const deleteTrackFromPlaylist = async (track) => {
     alert('Failed to remove track from playlist')
   }
 }
+
+onMounted(() => {
+  fetchPlaylist()
+})
+
+onUnmounted(() => {
+  audioStore.$reset()
+})
+
+definePageMeta({
+  middleware: 'auth'
+})
 </script>
-
-<style scoped>
-.content {
-  padding: 20px;
-}
-
-.playlist-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.playlist-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-right: 20px;
-}
-
-.playlist-info {
-  text-align: left;
-}
-
-.playlist-info h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.playlist-info p {
-  margin: 0;
-  color: #666;
-}
-
-.tracks {
-  margin-bottom: 40px;
-}
-
-.track-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.playlist-controls {
-  margin-top: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.control-btn {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: none;
-  background-color: #1db954;
-  color: white;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s;
-}
-
-.control-btn:hover {
-  background-color: #1ed760;
-}
-
-.delete-btn {
-  background-color: #ff4444;
-}
-
-.delete-btn:hover {
-  background-color: #ff6666;
-}
-
-.add-tracks-section {
-  margin: 40px auto;
-  padding: 0 20px;
-  max-width: 1200px;
-}
-
-.add-tracks-section h2 {
-  color: #fff;
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 24px;
-  padding-left: 20px;
-}
-</style>

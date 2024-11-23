@@ -1,37 +1,47 @@
 <template>
-  <div>
-    <div class="content">
-      <div class="artist-header">
-        <img :src="artist?.images[0]?.url" :alt="artist?.name" class="artist-image" />
-        <div class="artist-info">
-          <h1>{{ artist?.name }}</h1>
-          <p>{{ artist?.followers?.total }} followers</p>
+  <div class="min-h-screen bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col md:flex-row items-center md:items-end space-y-6 md:space-y-0 md:space-x-8 mb-12">
+        <img 
+          :src="artist?.images[0]?.url" 
+          :alt="artist?.name" 
+          class="w-64 h-64 object-cover rounded-full shadow-lg"
+        />
+        <div class="text-center md:text-left">
+          <h1 class="text-5xl font-bold mb-2">{{ artist?.name }}</h1>
+          <p class="text-xl text-gray-400">{{ formatFollowers(artist?.followers?.total) }} followers</p>
         </div>
       </div>
-      <section class="top-tracks">
-        <h2>Top Tracks</h2>
-        <div class="tracks">
+
+      <section class="mb-12">
+        <h2 class="text-2xl font-bold mb-6">Top Tracks</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           <TrackCard
             v-for="track in topTracks"
             :key="track.id"
             :track="track"
-            :imageUrl = "track.album.images[0]?.url"
+            :imageUrl="track.album.images[0]?.url"
           />
         </div>
       </section>
-      <section class="albums">
-        <h2>Albums</h2>
-        <div class="results">
+
+      <section>
+        <h2 class="text-2xl font-bold mb-6">Albums</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           <NuxtLink
             v-for="album in albums"
             :key="album.id"
             :to="`/albums/${album.id}`"
-            class="result-card"
+            class="bg-gray-800 rounded-lg overflow-hidden transition duration-300 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
           >
-            <img :src="album.images[0]?.url" :alt="album.name" class="result-image" />
-            <div class="result-info">
-              <h3>{{ album.name }}</h3>
-              <p>{{ album.release_date }}</p>
+            <img 
+              :src="album.images[0]?.url" 
+              :alt="album.name" 
+              class="w-full aspect-square object-cover"
+            />
+            <div class="p-4">
+              <h3 class="font-semibold text-sm mb-1 truncate">{{ album.name }}</h3>
+              <p class="text-gray-400 text-xs">{{ formatDate(album.release_date) }}</p>
             </div>
           </NuxtLink>
         </div>
@@ -41,15 +51,17 @@
 </template>
 
 <script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
 const route = useRoute()
 const authStore = useAuthStore()
 
-// State
 const artist = ref(null)
 const topTracks = ref([])
 const albums = ref([])
 
-// Fetch artist data
 const fetchArtistData = async () => {
   try {
     const [artistResponse, topTracksResponse, albumsResponse] = await Promise.all([
@@ -84,95 +96,26 @@ const fetchArtistData = async () => {
   }
 }
 
-// Fetch data on mount
+const formatFollowers = (followers) => {
+  if (!followers) return '0 followers'
+  if (followers >= 1000000) {
+    return `${(followers / 1000000).toFixed(1)}M followers`
+  } else if (followers >= 1000) {
+    return `${(followers / 1000).toFixed(1)}K followers`
+  } else {
+    return `${followers} followers`
+  }
+}
+
+const formatDate = (date) => {
+  return new Date(date).getFullYear()
+}
+
 onMounted(() => {
   fetchArtistData()
 })
 
-// Define page meta
 definePageMeta({
   middleware: 'auth'
 })
 </script>
-
-<style scoped>
-.content {
-  padding: 20px;
-}
-
-.artist-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 40px;
-}
-
-.artist-image {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-right: 20px;
-}
-
-.artist-info {
-  text-align: left;
-}
-
-.artist-info h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.artist-info p {
-  margin: 0;
-  color: #666;
-}
-
-.top-tracks, .albums {
-  margin-bottom: 40px;
-}
-
-.tracks, .results {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.result-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: transform 0.2s;
-  max-width: 200px;
-}
-
-.result-card:hover {
-  transform: scale(1.05);
-}
-
-.result-image {
-  width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-.result-info {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.result-info h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.result-info p {
-  margin: 0;
-  color: #666;
-}
-</style>

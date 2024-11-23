@@ -1,52 +1,53 @@
 <template>
-  <div>
-    <div class="content">
-      <div class="header">
-        <h1>Your Playlists</h1>
-        <button @click="showCreateModal = true" class="create-btn">
+  <div class="min-h-screen bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Your Playlists</h1>
+        <button @click="showCreateModal = true" class="bg-green-500 hover:bg-green-600 text-black font-bold py-2 px-4 rounded-full transition duration-300">
           Create Playlist
         </button>
       </div>
-      <div class="playlists">
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
         <NuxtLink 
           v-for="playlist in userPlaylists"
           :key="playlist.id"
           :to="`/playlists/${playlist.id}`"
+          class="transition duration-300 transform hover:scale-105"
         >
-          <PlaylistCard
-            :playlist="playlist"
-          />
+          <PlaylistCard :playlist="playlist" />
         </NuxtLink>
       </div>
 
       <!-- Create Playlist Modal -->
-      <div v-if="showCreateModal" class="modal-overlay">
-        <div class="modal">
-          <h2>Create New Playlist</h2>
+      <div v-if="showCreateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-8 w-full max-w-md">
+          <h2 class="text-2xl font-bold mb-6">Create New Playlist</h2>
           <form @submit.prevent="createPlaylist">
-            <div class="form-group">
-              <label for="name">Playlist Name</label>
+            <div class="mb-4">
+              <label for="name" class="block text-sm font-medium mb-2">Playlist Name</label>
               <input
                 v-model="newPlaylist.name"
                 type="text"
                 id="name"
                 required
                 placeholder="My Awesome Playlist"
+                class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               >
             </div>
-            <div class="form-group">
-              <label for="description">Description</label>
+            <div class="mb-6">
+              <label for="description" class="block text-sm font-medium mb-2">Description</label>
               <textarea
                 v-model="newPlaylist.description"
                 id="description"
                 placeholder="Add an optional description"
+                class="w-full px-3 py-2 bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 h-24 resize-none"
               ></textarea>
             </div>
-            <div class="form-actions">
-              <button type="button" @click="showCreateModal = false" class="cancel-btn">
+            <div class="flex justify-end space-x-4">
+              <button type="button" @click="showCreateModal = false" class="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-500 transition duration-300">
                 Cancel
               </button>
-              <button type="submit" class="submit-btn">
+              <button type="submit" class="px-4 py-2 bg-green-500 text-black rounded-md hover:bg-green-600 transition duration-300">
                 Create
               </button>
             </div>
@@ -62,7 +63,6 @@ const userPlaylists = ref([])
 const authStore = useAuthStore()
 const router = useRouter()
 
-// New refs for create playlist
 const showCreateModal = ref(false)
 const newPlaylist = ref({
   name: '',
@@ -85,7 +85,6 @@ const fetchUserPlaylists = async () => {
 
 const createPlaylist = async () => {
   try {
-    // First get the user's ID
     const userResponse = await fetch('https://api.spotify.com/v1/me', {
       headers: {
         Authorization: `Bearer ${authStore.token}`
@@ -93,7 +92,6 @@ const createPlaylist = async () => {
     })
     const userData = await userResponse.json()
 
-    // Create the playlist
     const response = await fetch(`https://api.spotify.com/v1/users/${userData.id}/playlists`, {
       method: 'POST',
       headers: {
@@ -109,12 +107,9 @@ const createPlaylist = async () => {
 
     if (response.ok) {
       const playlist = await response.json()
-      // Refresh the playlists list
       await fetchUserPlaylists()
-      // Reset form and close modal
       newPlaylist.value = { name: '', description: '' }
       showCreateModal.value = false
-      // Navigate to the new playlist
       navigateTo(`/playlists/${playlist.id}`)
     } else {
       throw new Error('Failed to create playlist')
@@ -129,132 +124,3 @@ onMounted(() => {
   fetchUserPlaylists()
 })
 </script>
-
-<style scoped>
-.content {
-  padding: 20px;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding: 0 20px;
-}
-
-h1 {
-  margin: 0;
-}
-
-.create-btn {
-  padding: 10px 20px;
-  border-radius: 20px;
-  border: none;
-  background-color: #1db954;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.create-btn:hover {
-  background-color: #1ed760;
-}
-
-.playlists {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
-}
-
-/* Modal styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal {
-  background: white;
-  padding: 30px;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.modal h2 {
-  margin: 0 0 20px 0;
-  color: #333;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #666;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 16px;
-}
-
-.form-group textarea {
-  height: 100px;
-  resize: vertical;
-}
-
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.cancel-btn {
-  padding: 10px 20px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  background: white;
-  color: #666;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.cancel-btn:hover {
-  background: #f5f5f5;
-}
-
-.submit-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 20px;
-  background: #1db954;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submit-btn:hover {
-  background: #1ed760;
-}
-</style>
