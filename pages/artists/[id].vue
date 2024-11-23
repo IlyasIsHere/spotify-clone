@@ -9,7 +9,7 @@
         />
         <div class="text-center md:text-left">
           <h1 class="text-5xl font-bold mb-2">{{ artist?.name }}</h1>
-          <p class="text-xl text-gray-400">{{ formatFollowers(artist?.followers?.total) }} followers</p>
+          <p class="text-xl text-gray-400">{{ formatFollowers(artist?.followers?.total) }}</p>
         </div>
       </div>
 

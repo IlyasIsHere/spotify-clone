@@ -50,6 +50,10 @@ export const useAudioStore = defineStore('audio', {
       }
 
       this.initAudio()
+      if (track.album) {
+        this.setImage(track.album.images[0].url)
+      }
+      
 
       // If it's a different track, load and play it
       if (!this.currentTrack || this.currentTrack.id !== track.id) {
