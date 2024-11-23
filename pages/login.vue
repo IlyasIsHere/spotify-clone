@@ -1,7 +1,9 @@
 <template>
-  <div class="login-container">
-    <h1>Login with Spotify</h1>
-    <button @click="handleLogin" class="login-button">
+  <div class="flex flex-col items-center justify-center" :style="{ marginTop: '25vh' }">
+    <button
+      @click="handleLogin"
+      class="px-8 py-4 bg-green-500 text-white rounded-full text-xl font-semibold hover:bg-green-400 transition-colors"
+    >
       Connect with Spotify
     </button>
   </div>
@@ -14,23 +16,3 @@ const handleLogin = () => {
   auth.login()
 }
 </script>
-
-<style scoped>
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
-
-.login-button {
-  padding: 12px 24px;
-  background-color: #1DB954;
-  color: white;
-  border: none;
-  border-radius: 24px;
-  font-size: 16px;
-  cursor: pointer;
-}
-</style>
