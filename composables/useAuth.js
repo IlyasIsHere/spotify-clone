@@ -3,7 +3,23 @@ export const useAuth = () => {
   const authStore = useAuthStore()
   
   const login = () => {
-    const scope = 'user-read-private user-read-email playlist-read-private playlist-modify-public playlist-modify-private user-top-read'
+    const scope = [
+      'user-read-private',
+      'user-read-email',
+      'playlist-read-private',
+      'playlist-modify-public',
+      'playlist-modify-private',
+      'user-top-read',
+      'playlist-read-collaborative',
+      'user-read-playback-state',
+      'user-modify-playback-state',
+      'user-read-currently-playing',
+      'streaming',
+      'playlist-modify-public',
+      'playlist-modify-private',
+      'user-library-read',
+      'user-library-modify'
+    ].join(' ')
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: config.public.spotifyClientId,
