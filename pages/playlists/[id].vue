@@ -4,7 +4,23 @@
       <div class="flex flex-col md:flex-row items-start md:items-center mb-8">
         <img :src="playlist?.images[0]?.url" :alt="playlist?.name" class="w-48 h-48 object-cover rounded-lg shadow-lg mb-4 md:mb-0 md:mr-8" />
         <div class="flex-1">
-          <h1 class="text-4xl font-bold mb-2">{{ playlist?.name }}</h1>
+          <div class="flex items-center mb-2">
+            <h1 v-if="!isEditing" class="text-4xl font-bold">{{ playlist?.name }}</h1>
+            <input
+              v-else
+              v-model="editedName"
+              class="text-4xl font-bold bg-gray-800 text-white rounded px-2 py-1 w-full"
+              @keyup.enter="savePlaylistName"
+              @keyup.esc="cancelEdit"
+            />
+            <button
+              @click="toggleEdit"
+              class="ml-4 text-gray-400 hover:text-white"
+            >
+              <span v-if="!isEditing">✏️</span>
+              <span v-else>❌</span>
+            </button>
+          </div>
           <p class="text-gray-400 mb-2">{{ playlist?.description }}</p>
           <p class="text-gray-400 mb-4">By {{ playlist?.owner?.display_name }}</p>
           <div class="flex space-x-4">
@@ -35,6 +51,26 @@
         </div>
       </div>
     </div>
+    <DeleteConfirmationModal 
+      v-if="showDeleteModal"
+      @confirm="confirmDelete"
+      @cancel="showDeleteModal = false"
+      :title="'Delete Playlist'"
+      :message="'Are you sure you want to delete this playlist? This action cannot be undone.'"
+    />
+    <NotificationModal
+      v-if="showSuccessModal"
+      @close="handleModalClose"
+      title="Success!"
+      message="Track has been added to your playlist"
+    />
+    <DeleteConfirmationModal 
+      v-if="showTrackDeleteModal"
+      @confirm="confirmTrackDelete"
+      @cancel="showTrackDeleteModal = false"
+      :title="'Delete Track'"
+      :message="'Are you sure you want to remove this track from the playlist?'"
+    />
   </div>
 </template>
 
@@ -42,11 +78,21 @@
 const route = useRoute()
 const authStore = useAuthStore()
 const audioStore = useAudioStore()
+import NotificationModal from '~/components/NotificationModal.vue'
 
 const playlist = ref(null)
 const isPlaying = computed(() => 
   audioStore.isPlaying && audioStore.currentPlaylist?.id === playlist.value?.id
 )
+
+const showDeleteModal = ref(false)
+const showSuccessModal = ref(false)
+const showTrackDeleteModal = ref(false)
+const showTrackDeleteSuccessModal = ref(false)
+const trackToDelete = ref(null)
+
+const isEditing = ref(false)
+const editedName = ref('')
 
 const fetchPlaylist = async () => {
   try {
@@ -69,9 +115,11 @@ const handlePlayPause = () => {
   }
 }
 
-const handleDelete = async () => {
-  if (!confirm('Are you sure you want to delete this playlist?')) return
+const handleDelete = () => {
+  showDeleteModal.value = true
+}
 
+const confirmDelete = async () => {
   try {
     await fetch(`https://api.spotify.com/v1/playlists/${route.params.id}/followers`, {
       method: 'DELETE',
@@ -79,6 +127,7 @@ const handleDelete = async () => {
         Authorization: `Bearer ${authStore.token}`
       }
     })
+    showDeleteModal.value = false
     navigateTo('/playlists')
   } catch (error) {
     console.error('Error deleting playlist:', error)
@@ -87,35 +136,28 @@ const handleDelete = async () => {
 
 const addTrackToPlaylist = async (track) => {
   try {
-    const response = await fetch(
-      `https://api.spotify.com/v1/playlists/${route.params.id}/tracks`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${authStore.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          uris: [`spotify:track:${track.id}`]
-        })
-      }
-    )
-
-    if (response.ok) {
-      await fetchPlaylist()
-      alert('Track added successfully!')
-    } else {
-      throw new Error('Failed to add track')
-    }
+    await fetch(`https://api.spotify.com/v1/playlists/${route.params.id}/tracks`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        uris: [track.uri]
+      })
+    })
+    showSuccessModal.value = true
   } catch (error) {
     console.error('Error adding track:', error)
-    alert('Failed to add track to playlist')
   }
 }
 
-const deleteTrackFromPlaylist = async (track) => {
-  if (!confirm('Are you sure you want to remove this track from the playlist?')) return
+const deleteTrackFromPlaylist = (track) => {
+  trackToDelete.value = track
+  showTrackDeleteModal.value = true
+}
 
+const confirmTrackDelete = async () => {
   try {
     const response = await fetch(
       `https://api.spotify.com/v1/playlists/${route.params.id}/tracks`,
@@ -126,20 +168,67 @@ const deleteTrackFromPlaylist = async (track) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          tracks: [{ uri: `spotify:track:${track.id}` }]
+          tracks: [{ uri: `spotify:track:${trackToDelete.value.id}` }]
         })
       }
     )
 
     if (response.ok) {
+      showTrackDeleteModal.value = false
       await fetchPlaylist()
-      alert('Track removed successfully!')
+      showTrackDeleteSuccessModal.value = true
     } else {
       throw new Error('Failed to remove track')
     }
   } catch (error) {
     console.error('Error removing track:', error)
-    alert('Failed to remove track from playlist')
+  }
+}
+
+const handleModalClose = async () => {
+  showSuccessModal.value = false
+  await fetchPlaylist()
+}
+
+const handleTrackDeleteSuccess = () => {
+  showTrackDeleteSuccessModal.value = false
+}
+
+const toggleEdit = () => {
+  if (!isEditing.value) {
+    editedName.value = playlist.value?.name
+    isEditing.value = true
+  } else {
+    cancelEdit()
+  }
+}
+
+const cancelEdit = () => {
+  isEditing.value = false
+  editedName.value = ''
+}
+
+const savePlaylistName = async () => {
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/playlists/${route.params.id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${authStore.token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: editedName.value
+      })
+    })
+    
+    if (response.ok) {
+      await fetchPlaylist()
+      isEditing.value = false
+    } else {
+      throw new Error('Failed to update playlist name')
+    }
+  } catch (error) {
+    console.error('Error updating playlist name:', error)
   }
 }
 
