@@ -55,16 +55,12 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import { useAuthStore } from '~/stores/auth';
 
-// Import the components
-import ArtistCard from '~/components/ArtistCard.vue';
-import PlaylistCard from '~/components/PlaylistCard.vue';
-import TrackCard from '~/components/TrackCard.vue';
+
 
 const route = useRoute();
-const router = useRouter();
 const authStore = useAuthStore();
 
 const results = ref([]);
@@ -106,12 +102,12 @@ const fetchResults = async () => {
     playlists.value = (data.playlists?.items || []).map((item) => ({
       ...item,
       type: 'Playlist',
-      image: item.images?.[0]?.url || 'default_playlist_image.jpg',
+      image: item.images?.[0]?.url || 'default_playlist_image.svg',
     }));
     tracks.value = (data.tracks?.items || []).map((item) => ({
       ...item,
       type: 'Track',
-      image: item.album?.images?.[0]?.url || 'default_track_image.jpg',
+      image: item.album?.images?.[0]?.url || 'default_track_image.png',
       albumId: item.album?.id,
       albumName: item.album?.name,
     }));

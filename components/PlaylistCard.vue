@@ -48,7 +48,7 @@ const router = useRouter()
 const audioStore = useAudioStore()
 
 const playlistImage = computed(() => {
-  return props.playlist.images?.[0]?.url || '/default_playlist_image.jpg'
+  return props.playlist.images?.[0]?.url || 'default_playlist_image.svg'
 })
 
 const isPlaying = computed(() => {
@@ -56,7 +56,7 @@ const isPlaying = computed(() => {
 })
 
 const handleImageError = (event) => {
-  event.target.src = '/default_playlist_image.jpg'
+  event.target.src = 'default_playlist_image.svg'
 }
 
 const truncateText = (text, maxLength) => {

@@ -57,7 +57,7 @@
   
   // Handle image loading error
   const handleImageError = (event) => {
-    event.target.src = '/default.avif'
+    event.target.src = '/default_artist_image.jpg'
   }
   </script>
   

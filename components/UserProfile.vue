@@ -1,7 +1,7 @@
 <template>
   <div class="bg-gray-900 rounded-lg p-6 shadow-lg text-center">
     <img
-      :src="user.images[0]?.url || '/default_user_image.jpg'"
+      :src="user.images[0]?.url || '/default_artist_image.jpg'"
       :alt="user.display_name"
       class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-2 border-green-500"
     />
