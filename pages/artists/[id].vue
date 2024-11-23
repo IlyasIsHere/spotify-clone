@@ -114,8 +114,4 @@ const formatDate = (date) => {
 onMounted(() => {
   fetchArtistData()
 })
-
-definePageMeta({
-  middleware: 'auth'
-})
 </script>

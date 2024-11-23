@@ -96,8 +96,4 @@ const fetchTrack = async () => {
 onMounted(() => {
   fetchTrack()
 })
-
-definePageMeta({
-  middleware: 'auth'
-})
 </script>

@@ -151,7 +151,4 @@ onUnmounted(() => {
   audioStore.$reset()
 })
 
-definePageMeta({
-  middleware: 'auth'
-})
 </script>

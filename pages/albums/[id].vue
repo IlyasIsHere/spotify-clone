@@ -80,8 +80,4 @@ const playAlbum = () => {
 onMounted(() => {
   fetchAlbum()
 })
-
-definePageMeta({
-  middleware: 'auth'
-})
 </script>
