@@ -2,7 +2,11 @@
   <div class="min-h-screen bg-gray-900 text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col md:flex-row items-start md:items-center mb-8">
-        <img :src="playlist?.images[0]?.url" :alt="playlist?.name" class="w-48 h-48 object-cover rounded-lg shadow-lg mb-4 md:mb-0 md:mr-8" />
+        <img 
+          :src="playlist?.images?.[0]?.url || '/default_playlist_image.svg'" 
+          :alt="playlist?.name || 'Playlist Cover'" 
+          class="w-48 h-48 object-cover rounded-lg shadow-lg mb-4 md:mb-0 md:mr-8" 
+        />
         <div class="flex-1">
           <div class="flex items-center mb-2">
             <h1 v-if="!isEditing" class="text-4xl font-bold">{{ playlist?.name }}</h1>
@@ -13,10 +17,7 @@
               @keyup.enter="savePlaylistName"
               @keyup.esc="cancelEdit"
             />
-            <button
-              @click="toggleEdit"
-              class="ml-4 text-gray-400 hover:text-white"
-            >
+            <button @click="toggleEdit" class="ml-4 text-gray-400 hover:text-white">
               <span v-if="!isEditing">✏️</span>
               <span v-else>❌</span>
             </button>
@@ -43,12 +44,13 @@
         <h2 class="text-2xl font-bold mb-4">Tracks</h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
           <TrackCard
-            v-for="track in playlist?.tracks?.items"
+            v-for="track in playlist?.tracks?.items || []"
             :key="track.track.id"
             :track="track.track"
             @delete-track="deleteTrackFromPlaylist"
           />
         </div>
+        <p v-if="!playlist?.tracks?.items?.length" class="text-gray-400 mt-4">No tracks available in this playlist.</p>
       </div>
     </div>
     <DeleteConfirmationModal 
