@@ -37,15 +37,15 @@
 </template>
 
 <script setup>
-// Nuxt-specific imports
 const route = useRoute()
 const authStore = useAuthStore()
 const audioStore = useAudioStore()
 
 // State
 const playlist = ref(null)
-const isPlaying = ref(false)
-const currentTrackIndex = ref(0)
+const isPlaying = computed(() => 
+  audioStore.isPlaying && audioStore.currentPlaylist?.id === playlist.value?.id
+)
 
 // Fetch playlist data
 const fetchPlaylist = async () => {
@@ -61,19 +61,13 @@ const fetchPlaylist = async () => {
   }
 }
 
-// Play track handler
-const playTrack = (track) => {
-  audioStore.playTrack(track)
-}
-
-// Modify existing functions and add new ones
+// Handle play/pause
 const handlePlayPause = () => {
   if (isPlaying.value) {
-    audioStore.pause()
+    audioStore.pauseTrack()
   } else {
-    playPlaylist()
+    audioStore.playPlaylist(playlist.value)
   }
-  isPlaying.value = !isPlaying.value
 }
 
 const handleDelete = async () => {
@@ -93,46 +87,7 @@ const handleDelete = async () => {
   }
 }
 
-// New function to play the playlist
-const playPlaylist = () => {
-  const tracks = playlist.value?.tracks?.items
-  if (!tracks?.length) return
-
-  // Start playing from current track index
-  const currentTrack = tracks[currentTrackIndex.value]?.track
-  if (currentTrack) {
-    audioStore.playTrack(currentTrack)
-
-    // Listen for track end and play next
-    audioStore.$subscribe((mutation, state) => {
-      if (state.isEnded) {
-        playNextTrack()
-      }
-    })
-  }
-}
-
-// Function to play next track
-const playNextTrack = () => {
-  const tracks = playlist.value?.tracks?.items
-  if (!tracks?.length) return
-
-  // Increment track index, loop back to start if at end
-  currentTrackIndex.value = (currentTrackIndex.value + 1) % tracks.length
-
-  // Play the next track
-  const nextTrack = tracks[currentTrackIndex.value]?.track
-  if (nextTrack) {
-    audioStore.playTrack(nextTrack)
-  }
-}
-
-// Watch audio store state to update local playing state
-watch(() => audioStore.isPlaying, (newValue) => {
-  isPlaying.value = newValue
-})
-
-// Clean up subscription when component unmounts
+// Clean up when component unmounts
 onUnmounted(() => {
   audioStore.$reset()
 })
@@ -165,9 +120,7 @@ const addTrackToPlaylist = async (track) => {
     )
 
     if (response.ok) {
-      // Refresh playlist data to show new track
       await fetchPlaylist()
-      // Show success message (you can implement your own notification system)
       alert('Track added successfully!')
     } else {
       throw new Error('Failed to add track')
@@ -178,7 +131,6 @@ const addTrackToPlaylist = async (track) => {
   }
 }
 
-// Add delete track function
 const deleteTrackFromPlaylist = async (track) => {
   if (!confirm('Are you sure you want to remove this track from the playlist?')) return
 
@@ -198,9 +150,7 @@ const deleteTrackFromPlaylist = async (track) => {
     )
 
     if (response.ok) {
-      // Refresh playlist data to update the track list
       await fetchPlaylist()
-      // Show success message
       alert('Track removed successfully!')
     } else {
       throw new Error('Failed to remove track')

@@ -6,12 +6,14 @@ export const useAudioStore = defineStore('audio', {
     currentTrack: null,
     isPlaying: false,
     volume: 1,
-    progress: 0
+    progress: 0,
+    currentPlaylist: null,
+    currentPlaylistIndex: 0
   }),
 
   persist: {
     storage: piniaPluginPersistedstate.localStorage(),
-    pick: ['currentTrack', 'volume', 'progress']
+    pick: ['currentTrack', 'volume', 'progress', 'currentPlaylist', 'currentPlaylistIndex']
   },
 
   actions: {
@@ -87,6 +89,11 @@ export const useAudioStore = defineStore('audio', {
     handleTrackEnd() {
       this.isPlaying = false
       this.progress = 0
+
+      // If we're playing a playlist, move to next track
+      if (this.currentPlaylist) {
+        this.playNextTrack()
+      }
     },
 
     setVolume(value) {
@@ -94,6 +101,47 @@ export const useAudioStore = defineStore('audio', {
       if (this.audio) {
         this.audio.volume = value
       }
+    },
+
+    async playPlaylist(playlist, startIndex = 0) {
+      if (!playlist?.tracks?.items?.length) return
+
+      this.currentPlaylist = playlist
+      this.currentPlaylistIndex = startIndex
+
+      // Get the track at current index
+      const trackItem = playlist.tracks.items[startIndex]
+      const track = trackItem.track || trackItem // Handle both full tracks and track references
+
+      await this.playTrack(track)
+    },
+
+    playNextTrack() {
+      if (!this.currentPlaylist?.tracks?.items?.length) return
+
+      // Increment index, wrapping around to 0 if at end
+      this.currentPlaylistIndex = (this.currentPlaylistIndex + 1) % this.currentPlaylist.tracks.items.length
+      
+      // Get the next track
+      const trackItem = this.currentPlaylist.tracks.items[this.currentPlaylistIndex]
+      const track = trackItem.track || trackItem
+
+      this.playTrack(track)
+    },
+
+    playPreviousTrack() {
+      if (!this.currentPlaylist?.tracks?.items?.length) return
+
+      // Decrement index, wrapping around to end if at 0
+      this.currentPlaylistIndex = this.currentPlaylistIndex === 0 
+        ? this.currentPlaylist.tracks.items.length - 1 
+        : this.currentPlaylistIndex - 1
+
+      // Get the previous track
+      const trackItem = this.currentPlaylist.tracks.items[this.currentPlaylistIndex]
+      const track = trackItem.track || trackItem
+
+      this.playTrack(track)
     }
   }
 })

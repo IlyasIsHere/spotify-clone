@@ -1,5 +1,5 @@
 <template>
-  <div class="playlist-card" @click="selectPlaylist" role="button" tabindex="0">
+  <div class="playlist-card" @click="handleClick" role="button" tabindex="0">
     <div class="playlist-image-container">
       <img
         :src="playlistImage"
@@ -7,6 +7,12 @@
         class="playlist-image"
         @error="handleImageError"
       />
+      <button 
+        class="play-button"
+        @click.stop="handlePlayPause"
+      >
+        {{ isPlaying ? 'Pause' : 'Play' }}
+      </button>
     </div>
     <div class="playlist-info">
       <h3 class="playlist-title">{{ truncateText(playlist.name, 25) }}</h3>
@@ -30,22 +36,24 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['select']);
+const router = useRouter();
+const audioStore = useAudioStore();
 
-// Default playlist image
-const defaultImage = '/path/to/default-playlist-image.jpg'; // Add your default image path
 
-// Computed property for playlist image
+// Computed properties
 const playlistImage = computed(() => {
-  return props.playlist.images?.[0]?.url || defaultImage;
+  return props.playlist.images?.[0]?.url;
 });
 
-// Handle image loading errors
+const isPlaying = computed(() => {
+  return audioStore.isPlaying && audioStore.currentPlaylist?.id === props.playlist.id;
+});
+
+// Methods
 const handleImageError = (event) => {
-  event.target.src = defaultImage;
+  event.target.src = '';
 };
 
-// Truncate long text
 const truncateText = (text, maxLength) => {
   if (!text) return '';
   return text.length > maxLength 
@@ -53,10 +61,15 @@ const truncateText = (text, maxLength) => {
     : text;
 };
 
-// Emit select event with playlist data
-const selectPlaylist = () => {
-  if (props.playlist?.id) {
-    emit('select', props.playlist);
+const handleClick = () => {
+  router.push(`/playlists/${props.playlist.id}`);
+};
+
+const handlePlayPause = () => {
+  if (isPlaying.value) {
+    audioStore.pauseTrack();
+  } else {
+    audioStore.playPlaylist(props.playlist);
   }
 };
 </script>
@@ -94,6 +107,7 @@ const selectPlaylist = () => {
   overflow: hidden;
   border-radius: 4px;
   background-color: #f0f0f0;
+  position: relative;
 }
 
 .playlist-image {
@@ -143,5 +157,23 @@ const selectPlaylist = () => {
   .playlist-description {
     font-size: 12px;
   }
+}
+
+.play-button {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  padding: 8px 16px;
+  background-color: #1DB954;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.playlist-card:hover .play-button {
+  opacity: 1;
 }
 </style>
