@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-8">
+  <div class="space-y-8 pb-8">
     <section>
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Your Playlists</h2>
