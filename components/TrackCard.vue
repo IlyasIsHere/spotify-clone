@@ -1,14 +1,47 @@
 <template>
-  <div class="track-card" @click="playTrack">
-    <img
-      :src="track.album.images[0]?.url"
-      :alt="track.name"
-      class="track-image"
-    />
+  <div 
+    class="track-card" 
+    :class="{ 'playing': isPlaying }"
+    @click="navigateToTrack"
+  >
+    <div class="track-image-container">
+      <img
+        :src="track.album ? track.album.images[0].url : imageUrl"
+        :alt="track.name"
+        class="track-image"
+      />
+      <button 
+        class="play-button"
+        :class="{ 'playing': isPlaying }"
+        @click="handlePlayClick"
+      >
+        <span v-if="isPlaying">⏸</span>
+        <span v-else>▶</span>
+      </button>
+    </div>
     <div class="track-info">
       <h3>{{ track.name }}</h3>
-      <p>{{ artistNames }}</p>
-      <p>{{ track.album.name }}</p>
+      <p>
+        <span v-for="(artist, index) in track.artists" :key="artist.id">
+          <NuxtLink 
+            :to="`/artists/${artist.id}`"
+            class="artist-link"
+            @click.stop
+          >
+            {{ artist.name }}
+          </NuxtLink>
+          <span v-if="index < track.artists.length - 1">, </span>
+        </span>
+      </p>
+      <p>
+        <NuxtLink 
+          :to="`/albums/${track.album ? track.album.id : albumId}`"
+          class="album-link"
+          @click.stop
+        >
+          {{ track.album ? track.album.name : albumName}}
+        </NuxtLink>
+      </p>
     </div>
   </div>
 </template>
@@ -19,17 +52,36 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  imageUrl: null,
+  albumId: null,
+  albumName: null,
 });
 
-const audioStore = useAudioStore()
+console.log(props.track);
 
-const playTrack = () => {
-  audioStore.playTrack(props.track)
+
+
+
+const audioStore = useAudioStore()
+const router = useRouter()
+
+const isPlaying = computed(() => {
+  return audioStore.isPlaying && audioStore.currentTrack?.id === props.track.id
+})
+
+const handlePlayClick = (event) => {
+  event.stopPropagation()
+  if (isPlaying.value) {
+    audioStore.pauseTrack()
+  } else {
+    audioStore.playTrack(props.track)
+  }
 }
 
-const artistNames = computed(() =>
-  props.track.artists.map((artist) => artist.name).join(', ')
-);
+const navigateToTrack = () => {
+  router.push(`/tracks/${props.track.id}`)
+}
+
 </script>
 
 <style scoped>
@@ -44,16 +96,53 @@ const artistNames = computed(() =>
   cursor: pointer;
   transition: transform 0.2s;
   max-width: 200px;
+  position: relative;
+  overflow: hidden;
 }
 
 .track-card:hover {
   transform: scale(1.05);
 }
 
+.track-image-container {
+  position: relative;
+  width: 100%;
+}
+
 .track-image {
   width: 100%;
   height: auto;
   border-radius: 4px;
+}
+
+.play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(29, 185, 84, 0.9);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.track-image-container:hover .play-button {
+  opacity: 1;
+}
+
+.play-button.playing {
+  opacity: 1;
+  background-color: #1DB954;
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.4);
 }
 
 .track-info {
@@ -69,5 +158,37 @@ const artistNames = computed(() =>
 .track-info p {
   margin: 0;
   color: #666;
+}
+
+.track-card.playing {
+  border-color: #1DB954;
+  background: linear-gradient(to right, rgba(29, 185, 84, 0.1), transparent);
+  box-shadow: 0 2px 8px rgba(29, 185, 84, 0.2);
+}
+
+.track-card.playing::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background-color: #1DB954;
+}
+
+.track-card.playing .track-info h3 {
+  color: #1DB954;
+}
+
+.artist-link,
+.album-link {
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.artist-link:hover,
+.album-link:hover {
+  color: #1DB954;
 }
 </style>

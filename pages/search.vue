@@ -6,45 +6,48 @@
           <section v-if="artists.length">
             <h2>Artists</h2>
             <div class="results">
-              <div
+              <NuxtLink
                 v-for="artist in artists"
                 :key="artist.id"
+                :to="`/artists/${artist.id}`"
                 class="result-card"
-                @click="goToArtist(artist)"
               >
                 <img :src="artist.images[0]?.url" alt="artist.name" class="result-image" />
                 <div class="result-info">
                   <h3>{{ artist.name }}</h3>
                 </div>
-              </div>
+              </NuxtLink>
             </div>
           </section>
           <section v-if="albums.length">
             <h2>Albums</h2>
             <div class="results">
-              <div
+              <NuxtLink
                 v-for="album in albums"
                 :key="album.id"
+                :to="`/albums/${album.id}`"
                 class="result-card"
-                @click="goToAlbum(album)"
               >
                 <img :src="album.images[0]?.url" alt="album.name" class="result-image" />
                 <div class="result-info">
                   <h3>{{ album.name }}</h3>
                   <p>{{ album.artists.map(artist => artist.name).join(', ') }}</p>
                 </div>
-              </div>
+              </NuxtLink>
             </div>
           </section>
           <section v-if="playlists.length">
             <h2>Playlists</h2>
             <div class="results">
-              <PlaylistCard
+              <NuxtLink
                 v-for="playlist in playlists"
                 :key="playlist.id"
-                :playlist="playlist"
-                @select="goToPlaylist"
-              />
+                :to="`/playlists/${playlist.id}`"
+              >
+                <PlaylistCard
+                  :playlist="playlist"
+                />
+              </NuxtLink>
             </div>
           </section>
           <section v-if="tracks.length">
@@ -54,6 +57,7 @@
                 v-for="track in tracks"
                 :key="track.id"
                 :track="track"
+                :imageUrl = "track.album.images[0]?.url"
               />
             </div>
           </section>
@@ -63,15 +67,11 @@
   </template>
   
   <script setup>
-
-  
   const searchResults = ref([]);
   const artists = ref([]);
   const albums = ref([]);
   const playlists = ref([]);
   const tracks = ref([]);
-  const auth = useAuth();
-  const router = useRouter();
   
   const handleSelect = (result) => {
     searchResults.value = result;
@@ -81,22 +81,6 @@
     tracks.value = result.filter(item => item.type === 'track');
   };
   
-  const goToArtist = (artist) => {
-    router.push(`/artist/${artist.id}`);
-  };
-  
-  const goToAlbum = (album) => {
-    router.push(`/album/${album.id}`);
-  };
-  
-  const goToPlaylist = (playlist) => {
-    router.push(`/playlist/${playlist.id}`);
-  };
-  
-  const playTrack = (track) => {
-    store.commit('setCurrentTrack', track);
-    store.commit('setIsPlaying', true);
-  };
   </script>
   
   <style scoped>

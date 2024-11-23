@@ -31,6 +31,7 @@
               v-for="track in topTracks"
               :key="track.id"
               :track="track"
+              :imageUrl = "track.album.images[0]?.url"
             />
           </div>
         </section>

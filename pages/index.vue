@@ -4,12 +4,15 @@
         <section class="recommended-playlists">
           <h2>Recommended Playlists</h2>
           <div class="playlists">
-            <PlaylistCard
+            <NuxtLink 
               v-for="playlist in recommendedPlaylists"
-              :key="playlist.id"
-              :playlist="playlist"
-              @select="goToPlaylist"
-            />
+              :key="playlist.id" 
+              :to="`/playlists/${playlist.id}`"
+            >
+              <PlaylistCard
+                :playlist="playlist"
+              />
+            </NuxtLink>
           </div>
         </section>
         <section class="recommended-tracks">
@@ -19,6 +22,7 @@
               v-for="track in recommendedTracks"
               :key="track.id"
               :track="track"
+              :imageUrl = "track.album.images[0]?.url"
             />
           </div>
         </section>
@@ -31,7 +35,6 @@
   const recommendedPlaylists = ref([]);
   const recommendedTracks = ref([]);
   const authStore = useAuthStore()
-  const router = useRouter();
   
   const fetchRecommendedPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/browse/featured-playlists', {
@@ -40,7 +43,6 @@
       }
     });
     const data = await response.json();
-    console.log(authStore);
     
     recommendedPlaylists.value = data.playlists.items;
   };
@@ -53,10 +55,6 @@
     });
     const data = await response.json();
     recommendedTracks.value = data.items;
-  };
-  
-  const goToPlaylist = (playlist) => {
-    router.push(`/playlist/${playlist.id}`);
   };
   
   onMounted(() => {

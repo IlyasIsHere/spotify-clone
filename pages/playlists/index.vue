@@ -3,12 +3,15 @@
       <div class="content">
         <h1>Your Playlists</h1>
         <div class="playlists">
-          <PlaylistCard
-            v-for="playlist in userPlaylists"
+          <NuxtLink
+            v-for="playlist in userPlaylists" 
             :key="playlist.id"
-            :playlist="playlist"
-            @select="goToPlaylist"
-          />
+            :to="`/playlists/${playlist.id}`"
+          >
+            <PlaylistCard
+              :playlist="playlist"
+            />
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -18,7 +21,6 @@
   
   const userPlaylists = ref([]);
   const authStore = useAuthStore();
-  const router = useRouter();
   
   const fetchUserPlaylists = async () => {
     const response = await fetch('https://api.spotify.com/v1/me/playlists', {
@@ -28,10 +30,6 @@
     });
     const data = await response.json();
     userPlaylists.value = data.items;
-  };
-  
-  const goToPlaylist = (playlist) => {
-    router.push(`/playlist/${playlist.id}`);
   };
   
   onMounted(() => {
